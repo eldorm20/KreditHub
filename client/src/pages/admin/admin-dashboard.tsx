@@ -82,8 +82,8 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6">
+      <div className="max-w-7xl mx-auto animate-fade-in">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="modern-card animate-slide-up">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Users</CardTitle>
               <Users className="h-4 w-4 text-blue-600" />
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="modern-card animate-slide-up">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Loans</CardTitle>
               <Banknote className="h-4 w-4 text-green-600" />
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="modern-card animate-slide-up">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Volume</CardTitle>
               <TrendingUp className="h-4 w-4 text-purple-600" />
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="modern-card animate-slide-up">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">System Health</CardTitle>
               <Shield className="h-4 w-4 text-green-600" />
@@ -143,16 +143,16 @@ export default function AdminDashboard() {
 
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="users" id="users-tab">User Management</TabsTrigger>
-            <TabsTrigger value="system" id="system-tab">System Health</TabsTrigger>
-            <TabsTrigger value="settings" id="settings-tab">Settings</TabsTrigger>
+            <TabsTrigger value="overview" data-value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="users" data-value="users">User Management</TabsTrigger>
+            <TabsTrigger value="system" data-value="system">System Health</TabsTrigger>
+            <TabsTrigger value="settings" data-value="settings">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid lg:grid-cols-3 gap-6">
               {/* User Breakdown */}
-              <Card>
+              <Card className="modern-card animate-slide-up">
                 <CardHeader>
                   <CardTitle>User Distribution</CardTitle>
                 </CardHeader>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
               </Card>
 
               {/* Platform Metrics */}
-              <Card>
+              <Card className="modern-card animate-slide-up">
                 <CardHeader>
                   <CardTitle>Platform Metrics</CardTitle>
                 </CardHeader>
@@ -214,16 +214,15 @@ export default function AdminDashboard() {
               </Card>
 
               {/* Quick Actions */}
-              <Card>
+              <Card className="modern-card animate-slide-up">
                 <CardHeader>
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button 
-                    className="w-full justify-start modern-card btn-primary" 
-                    variant="outline"
+                    className="w-full justify-start btn-primary" 
                     onClick={() => {
-                      const tab = document.querySelector('[value="users"]') as HTMLElement;
+                      const tab = document.querySelector('[data-value="users"]') as HTMLElement;
                       if (tab) tab.click();
                     }}
                   >
@@ -231,10 +230,9 @@ export default function AdminDashboard() {
                     Manage Users
                   </Button>
                   <Button 
-                    className="w-full justify-start modern-card btn-primary" 
-                    variant="outline"
+                    className="w-full justify-start btn-primary" 
                     onClick={() => {
-                      const tab = document.querySelector('[value="system"]') as HTMLElement;
+                      const tab = document.querySelector('[data-value="system"]') as HTMLElement;
                       if (tab) tab.click();
                     }}
                   >
@@ -242,10 +240,9 @@ export default function AdminDashboard() {
                     System Backup
                   </Button>
                   <Button 
-                    className="w-full justify-start modern-card btn-primary" 
-                    variant="outline"
+                    className="w-full justify-start btn-primary" 
                     onClick={() => {
-                      const tab = document.querySelector('[value="settings"]') as HTMLElement;
+                      const tab = document.querySelector('[data-value="settings"]') as HTMLElement;
                       if (tab) tab.click();
                     }}
                   >
@@ -253,10 +250,9 @@ export default function AdminDashboard() {
                     Platform Settings
                   </Button>
                   <Button 
-                    className="w-full justify-start modern-card btn-primary" 
-                    variant="outline"
+                    className="w-full justify-start btn-primary" 
                     onClick={() => {
-                      const tab = document.querySelector('[value="system"]') as HTMLElement;
+                      const tab = document.querySelector('[data-value="system"]') as HTMLElement;
                       if (tab) tab.click();
                     }}
                   >
@@ -268,7 +264,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Recent Activity */}
-            <Card>
+            <Card className="modern-card animate-slide-up">
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
                 <CardDescription>Latest platform events and alerts</CardDescription>
@@ -502,10 +498,8 @@ export default function AdminDashboard() {
                       <div>• At least one special character</div>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href="/admin/security-policies">
-                      Configure Security Policies
-                    </Link>
+                  <Button variant="outline" className="w-full" onClick={() => window.location.href = '/admin/security-policies'}>
+                    Configure Security Policies
                   </Button>
                 </CardContent>
               </Card>
@@ -573,10 +567,8 @@ export default function AdminDashboard() {
                     </div>
                     <input type="checkbox" className="toggle" defaultChecked />
                   </div>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href="/admin/api-management">
-                      Manage API Keys
-                    </Link>
+                  <Button variant="outline" className="w-full" onClick={() => window.location.href = '/admin/api-management'}>
+                    Manage API Keys
                   </Button>
                 </CardContent>
               </Card>
