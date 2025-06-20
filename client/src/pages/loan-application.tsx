@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Building, User, DollarSign } from "lucide-react";
+import { ArrowLeft, Building, User, DollarSign, Globe } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const loanApplicationSchema = z.object({
   // Business Information
@@ -36,6 +37,7 @@ export default function LoanApplication() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { selectedCurrency, currencies, setCurrency, formatAmount } = useCurrency();
   const [step, setStep] = useState(1);
 
   const form = useForm<LoanApplicationForm>({
@@ -105,18 +107,40 @@ export default function LoanApplication() {
           </p>
         </div>
 
-        {/* Language Selector */}
-        <div className="mb-6">
-          <Select defaultValue="english">
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="english">English</SelectItem>
-              <SelectItem value="uzbek">Uzbek</SelectItem>
-              <SelectItem value="russian">Russian</SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Language and Currency Selectors */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Language</label>
+            <Select defaultValue="english">
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="english">English</SelectItem>
+                <SelectItem value="uzbek">Uzbek</SelectItem>
+                <SelectItem value="russian">Russian</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Currency</label>
+            <Select value={selectedCurrency.code} onValueChange={(code) => {
+              const currency = currencies.find(c => c.code === code);
+              if (currency) setCurrency(currency);
+            }}>
+              <SelectTrigger className="w-48">
+                <Globe className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {currencies.map((currency) => (
+                  <SelectItem key={currency.code} value={currency.code}>
+                    {currency.symbol} {currency.code} - {currency.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <Form {...form}>
@@ -241,18 +265,26 @@ export default function LoanApplication() {
                           <FormLabel>Requested Loan Amount *</FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                USD
+                              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                                {selectedCurrency.symbol}
                               </span>
                               <Input
                                 type="number"
-                                placeholder="5,000"
+                                placeholder={formatAmount(5000, false)}
                                 className="pl-12"
                                 {...field}
                                 onChange={(e) => field.onChange(Number(e.target.value))}
                               />
+                              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+                                {selectedCurrency.code}
+                              </div>
                             </div>
                           </FormControl>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {field.value > 0 && (
+                              <>Equivalent to approximately ${((field.value || 0) / selectedCurrency.exchangeRate).toLocaleString()} USD</>
+                            )}
+                          </p>
                           <FormMessage />
                         </FormItem>
                       )}
