@@ -220,33 +220,45 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button 
-                    className="w-full justify-start" 
+                    className="w-full justify-start modern-card btn-primary" 
                     variant="outline"
-                    onClick={() => document.getElementById('users-tab')?.click()}
+                    onClick={() => {
+                      const tab = document.querySelector('[value="users"]') as HTMLElement;
+                      if (tab) tab.click();
+                    }}
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Manage Users
                   </Button>
                   <Button 
-                    className="w-full justify-start" 
+                    className="w-full justify-start modern-card btn-primary" 
                     variant="outline"
-                    onClick={() => document.getElementById('system-tab')?.click()}
+                    onClick={() => {
+                      const tab = document.querySelector('[value="system"]') as HTMLElement;
+                      if (tab) tab.click();
+                    }}
                   >
                     <Database className="h-4 w-4 mr-2" />
                     System Backup
                   </Button>
                   <Button 
-                    className="w-full justify-start" 
+                    className="w-full justify-start modern-card btn-primary" 
                     variant="outline"
-                    onClick={() => document.getElementById('settings-tab')?.click()}
+                    onClick={() => {
+                      const tab = document.querySelector('[value="settings"]') as HTMLElement;
+                      if (tab) tab.click();
+                    }}
                   >
                     <Settings className="h-4 w-4 mr-2" />
                     Platform Settings
                   </Button>
                   <Button 
-                    className="w-full justify-start" 
+                    className="w-full justify-start modern-card btn-primary" 
                     variant="outline"
-                    onClick={() => document.getElementById('system-tab')?.click()}
+                    onClick={() => {
+                      const tab = document.querySelector('[value="system"]') as HTMLElement;
+                      if (tab) tab.click();
+                    }}
                   >
                     <Shield className="h-4 w-4 mr-2" />
                     Security Audit
@@ -490,8 +502,10 @@ export default function AdminDashboard() {
                       <div>• At least one special character</div>
                     </div>
                   </div>
-                  <Button variant="outline" className="w-full">
-                    Configure Security Policies
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/admin/security-policies">
+                      Configure Security Policies
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -559,8 +573,10 @@ export default function AdminDashboard() {
                     </div>
                     <input type="checkbox" className="toggle" defaultChecked />
                   </div>
-                  <Button variant="outline" className="w-full">
-                    Manage API Keys
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href="/admin/api-management">
+                      Manage API Keys
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>

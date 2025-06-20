@@ -1,3 +1,4 @@
+import React from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -87,6 +88,10 @@ function Router() {
       <Route path="/settings">
         <ProtectedRoute component={Settings} />
       </Route>
+      <Route path="/business-settings" component={() => {
+        const LazyComponent = React.lazy(() => import("@/pages/business-settings"));
+        return <React.Suspense fallback={<div>Loading...</div>}><LazyComponent /></React.Suspense>;
+      }} />
       
       {/* FI Routes */}
       <Route path="/fi/applications">
@@ -98,6 +103,10 @@ function Router() {
       <Route path="/fi/settings">
         <ProtectedRoute component={FISettings} />
       </Route>
+      <Route path="/fi/recent-applications" component={() => {
+        const LazyComponent = React.lazy(() => import("@/pages/fi/recent-applications"));
+        return <React.Suspense fallback={<div>Loading...</div>}><LazyComponent /></React.Suspense>;
+      }} />
       
       {/* Admin Routes */}
       <Route path="/admin/users">
@@ -106,6 +115,14 @@ function Router() {
       <Route path="/admin/settings">
         <ProtectedRoute component={() => <div className="p-8 text-center">Admin Settings - Coming Soon</div>} />
       </Route>
+      <Route path="/admin/api-management" component={() => {
+        const LazyComponent = React.lazy(() => import("@/pages/admin/api-management"));
+        return <React.Suspense fallback={<div>Loading...</div>}><LazyComponent /></React.Suspense>;
+      }} />
+      <Route path="/admin/security-policies" component={() => {
+        const LazyComponent = React.lazy(() => import("@/pages/admin/security-policies"));
+        return <React.Suspense fallback={<div>Loading...</div>}><LazyComponent /></React.Suspense>;
+      }} />
       
       {/* Shared Routes */}
       <Route path="/messages">
@@ -135,14 +152,16 @@ function AppHeader() {
   const { selectedCurrency, currencies, setCurrency } = useCurrency();
   
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 transition-colors">
+    <header className="glass-nav sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">K</span>
+          <div className="flex items-center space-x-3 animate-fade-in">
+            <div className="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center shadow-lg animate-float">
+              <span className="text-white font-bold text-xl">K</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">KreditHub</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              KreditHub
+            </span>
           </div>
           <div className="flex items-center space-x-4">
             {/* Currency Selector */}
