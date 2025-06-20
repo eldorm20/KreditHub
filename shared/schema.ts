@@ -243,6 +243,12 @@ export const insertMessageSchema = createInsertSchema(messages).omit({
   sentAt: true,
 });
 
+export const insertCurrencySchema = createInsertSchema(currencies);
+export const insertTransactionSchema = createInsertSchema(transactions).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUserType = z.infer<typeof insertUserSchema>;
 export type InsertSMBProfileType = z.infer<typeof insertSMBProfileSchema>;
 export type InsertFIProfileType = z.infer<typeof insertFIProfileSchema>;
