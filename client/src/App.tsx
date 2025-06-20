@@ -19,6 +19,9 @@ import Applications from "@/pages/applications";
 import Documents from "@/pages/documents";
 import Analytics from "@/pages/analytics";
 import Messages from "@/pages/messages";
+import FIDashboard from "@/pages/fi/fi-dashboard";
+import FIApplications from "@/pages/fi/applications";
+import AdminDashboard from "@/pages/admin/admin-dashboard";
 import NotFound from "@/pages/not-found";
 
 function ProtectedRoute({ component: Component }: { component: any }) {
@@ -42,14 +45,26 @@ function ProtectedRoute({ component: Component }: { component: any }) {
 function Router() {
   const { user } = useAuth();
   
+  // Role-based dashboard routing
+  const getDashboardComponent = () => {
+    if (!user) return Homepage;
+    switch (user.role) {
+      case 'fi': return FIDashboard;
+      case 'admin': return AdminDashboard;
+      default: return Dashboard;
+    }
+  };
+  
   return (
     <Switch>
-      <Route path="/" component={user ? Dashboard : Homepage} />
+      <Route path="/" component={user ? getDashboardComponent() : Homepage} />
       <Route path="/auth/login" component={Login} />
       <Route path="/auth/register" component={Register} />
       <Route path="/dashboard">
-        <ProtectedRoute component={Dashboard} />
+        <ProtectedRoute component={getDashboardComponent()} />
       </Route>
+      
+      {/* SMB Routes */}
       <Route path="/apply">
         <ProtectedRoute component={LoanApplication} />
       </Route>
@@ -62,9 +77,28 @@ function Router() {
       <Route path="/analytics">
         <ProtectedRoute component={Analytics} />
       </Route>
+      
+      {/* FI Routes */}
+      <Route path="/fi/applications">
+        <ProtectedRoute component={FIApplications} />
+      </Route>
+      <Route path="/fi/portfolio">
+        <ProtectedRoute component={() => <div className="p-8 text-center">FI Portfolio Management - Coming Soon</div>} />
+      </Route>
+      
+      {/* Admin Routes */}
+      <Route path="/admin/users">
+        <ProtectedRoute component={() => <div className="p-8 text-center">User Management - Coming Soon</div>} />
+      </Route>
+      <Route path="/admin/settings">
+        <ProtectedRoute component={() => <div className="p-8 text-center">Admin Settings - Coming Soon</div>} />
+      </Route>
+      
+      {/* Shared Routes */}
       <Route path="/messages">
         <ProtectedRoute component={Messages} />
       </Route>
+      
       <Route component={NotFound} />
     </Switch>
   );
