@@ -95,48 +95,61 @@ export default function AdminDashboard() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="modern-card animate-slide-up">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+          <Card className="modern-card jeton-card interactive-glow animate-scale-in">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-sm font-bold text-cyan-400 tracking-wider uppercase">Total Users</CardTitle>
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl flex items-center justify-center animate-float">
+                <Users className="h-6 w-6 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
-              <p className="text-xs text-green-600">+{stats.newUsersToday} today</p>
+              <div className="text-4xl font-black text-white mb-2">{stats.totalUsers.toLocaleString()}</div>
+              <p className="text-sm text-green-400 font-semibold">+{stats.newUsersToday} today ↗</p>
             </CardContent>
           </Card>
 
-          <Card className="modern-card animate-slide-up">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Loans</CardTitle>
-              <Banknote className="h-4 w-4 text-green-600" />
+          <Card className="modern-card jeton-card interactive-glow animate-scale-in" style={{animationDelay: '0.1s'}}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-sm font-bold text-green-400 tracking-wider uppercase">Active Loans</CardTitle>
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-400 rounded-2xl flex items-center justify-center animate-float">
+                <Banknote className="h-6 w-6 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.activeLoans}</div>
-              <p className="text-xs text-gray-500">Currently processing</p>
+              <div className="text-4xl font-black text-white mb-2">{stats.activeLoans}</div>
+              <p className="text-sm text-gray-400 font-semibold">Currently processing</p>
             </CardContent>
           </Card>
 
-          <Card className="modern-card animate-slide-up">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Volume</CardTitle>
-              <TrendingUp className="h-4 w-4 text-purple-600" />
+          <Card className="modern-card jeton-card interactive-glow animate-scale-in" style={{animationDelay: '0.2s'}}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-sm font-bold text-purple-400 tracking-wider uppercase">Total Volume</CardTitle>
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-400 rounded-2xl flex items-center justify-center animate-float">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatAmount(stats.totalVolume)}</div>
-              <p className="text-xs text-green-600">+{stats.monthlyGrowth}% this month</p>
+              <div className="text-4xl font-black text-white mb-2">{formatAmount(stats.totalVolume)}</div>
+              <p className="text-sm text-green-400 font-semibold">+{stats.monthlyGrowth}% this month ↗</p>
             </CardContent>
           </Card>
 
-          <Card className="modern-card animate-slide-up">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">System Health</CardTitle>
-              <Shield className="h-4 w-4 text-green-600" />
+          <Card className="modern-card jeton-card interactive-glow animate-scale-in" style={{animationDelay: '0.3s'}}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-sm font-bold text-orange-400 tracking-wider uppercase">System Health</CardTitle>
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-400 rounded-2xl flex items-center justify-center animate-float">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.systemHealth}%</div>
-              <Progress value={stats.systemHealth} className="mt-2" />
+              <div className="text-4xl font-black text-white mb-2">{stats.systemHealth}%</div>
+              <div className="w-full bg-gray-700 rounded-full h-3 mt-3">
+                <div 
+                  className="bg-gradient-to-r from-green-500 to-emerald-400 h-3 rounded-full transition-all duration-1000 animate-pulse-slow" 
+                  style={{width: `${stats.systemHealth}%`}}
+                ></div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -220,44 +233,56 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button 
-                    className="w-full justify-start btn-primary" 
+                    className="w-full justify-start btn-primary interactive-glow" 
                     onClick={() => {
-                      const tab = document.querySelector('[data-value="users"]') as HTMLElement;
-                      if (tab) tab.click();
+                      const tab = document.querySelector('[data-value="users"]') as HTMLButtonElement;
+                      if (tab) {
+                        tab.click();
+                        setTimeout(() => tab.focus(), 100);
+                      }
                     }}
                   >
-                    <Users className="h-4 w-4 mr-2" />
-                    Manage Users
+                    <Users className="h-5 w-5 mr-3" />
+                    <span className="font-bold">Manage Users</span>
                   </Button>
                   <Button 
-                    className="w-full justify-start btn-primary" 
+                    className="w-full justify-start btn-primary interactive-glow" 
                     onClick={() => {
-                      const tab = document.querySelector('[data-value="system"]') as HTMLElement;
-                      if (tab) tab.click();
+                      const tab = document.querySelector('[data-value="system"]') as HTMLButtonElement;
+                      if (tab) {
+                        tab.click();
+                        setTimeout(() => tab.focus(), 100);
+                      }
                     }}
                   >
-                    <Database className="h-4 w-4 mr-2" />
-                    System Backup
+                    <Database className="h-5 w-5 mr-3" />
+                    <span className="font-bold">System Backup</span>
                   </Button>
                   <Button 
-                    className="w-full justify-start btn-primary" 
+                    className="w-full justify-start btn-primary interactive-glow" 
                     onClick={() => {
-                      const tab = document.querySelector('[data-value="settings"]') as HTMLElement;
-                      if (tab) tab.click();
+                      const tab = document.querySelector('[data-value="settings"]') as HTMLButtonElement;
+                      if (tab) {
+                        tab.click();
+                        setTimeout(() => tab.focus(), 100);
+                      }
                     }}
                   >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Platform Settings
+                    <Settings className="h-5 w-5 mr-3" />
+                    <span className="font-bold">Platform Settings</span>
                   </Button>
                   <Button 
-                    className="w-full justify-start btn-primary" 
+                    className="w-full justify-start btn-primary interactive-glow" 
                     onClick={() => {
-                      const tab = document.querySelector('[data-value="system"]') as HTMLElement;
-                      if (tab) tab.click();
+                      const tab = document.querySelector('[data-value="system"]') as HTMLButtonElement;
+                      if (tab) {
+                        tab.click();
+                        setTimeout(() => tab.focus(), 100);
+                      }
                     }}
                   >
-                    <Shield className="h-4 w-4 mr-2" />
-                    Security Audit
+                    <Shield className="h-5 w-5 mr-3" />
+                    <span className="font-bold">Security Audit</span>
                   </Button>
                 </CardContent>
               </Card>

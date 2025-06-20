@@ -112,6 +112,10 @@ function Router() {
       <Route path="/admin/users">
         <ProtectedRoute component={() => <div className="p-8 text-center">User Management - Coming Soon</div>} />
       </Route>
+      <Route path="/admin/user-management" component={() => {
+        const LazyComponent = React.lazy(() => import("@/pages/admin/user-management"));
+        return <React.Suspense fallback={<div>Loading...</div>}><LazyComponent /></React.Suspense>;
+      }} />
       <Route path="/admin/settings">
         <ProtectedRoute component={() => <div className="p-8 text-center">Admin Settings - Coming Soon</div>} />
       </Route>
@@ -152,18 +156,24 @@ function AppHeader() {
   const { selectedCurrency, currencies, setCurrency } = useCurrency();
   
   return (
-    <header className="glass-nav sticky top-0 z-50 transition-all duration-300">
+    <header className={`glass-nav ${effectiveTheme === 'dark' ? 'glass-nav-dark' : 'glass-nav-light'} sticky top-0 z-50 transition-all duration-500`}>
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 animate-fade-in">
-            <div className="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center shadow-lg animate-float">
-              <span className="text-white font-bold text-xl">K</span>
+          <div className="flex items-center space-x-4 animate-fade-in">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-600 to-cyan-500 rounded-2xl flex items-center justify-center shadow-2xl animate-float relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 animate-pulse-slow opacity-75"></div>
+              <span className="text-white font-black text-xl relative z-10">K</span>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              KreditHub
-            </span>
+            <div className="flex flex-col">
+              <span className="text-3xl font-black heading-gradient heading-primary">
+                KreditHub
+              </span>
+              <span className={`text-xs ${effectiveTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'} tracking-wider`}>
+                FINANCIAL PLATFORM
+              </span>
+            </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {/* Currency Selector */}
             <Select value={selectedCurrency.code} onValueChange={(code) => {
               const currency = currencies.find(c => c.code === code);
