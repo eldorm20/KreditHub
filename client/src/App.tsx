@@ -16,12 +16,15 @@ import Register from "@/pages/auth/register";
 import Dashboard from "@/pages/dashboard";
 import LoanApplication from "@/pages/loan-application";
 import Applications from "@/pages/applications";
+import ApplicationDetails from "@/pages/application-details";
 import Documents from "@/pages/documents";
 import Analytics from "@/pages/analytics";
 import Messages from "@/pages/messages";
+import Settings from "@/pages/settings";
 import FIDashboard from "@/pages/fi/fi-dashboard";
 import FIApplications from "@/pages/fi/applications";
 import FIPortfolio from "@/pages/fi/portfolio";
+import FISettings from "@/pages/fi/fi-settings";
 import AdminDashboard from "@/pages/admin/admin-dashboard";
 import NotFound from "@/pages/not-found";
 
@@ -72,11 +75,17 @@ function Router() {
       <Route path="/applications">
         <ProtectedRoute component={Applications} />
       </Route>
+      <Route path="/applications/:id">
+        <ProtectedRoute component={ApplicationDetails} />
+      </Route>
       <Route path="/documents">
         <ProtectedRoute component={Documents} />
       </Route>
       <Route path="/analytics">
         <ProtectedRoute component={Analytics} />
+      </Route>
+      <Route path="/settings">
+        <ProtectedRoute component={Settings} />
       </Route>
       
       {/* FI Routes */}
@@ -85,6 +94,9 @@ function Router() {
       </Route>
       <Route path="/fi/portfolio">
         <ProtectedRoute component={FIPortfolio} />
+      </Route>
+      <Route path="/fi/settings">
+        <ProtectedRoute component={FISettings} />
       </Route>
       
       {/* Admin Routes */}

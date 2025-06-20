@@ -9,9 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Building, User, DollarSign, Globe } from "lucide-react";
+import { ArrowLeft, Building, User, DollarSign, Globe, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
@@ -54,19 +53,43 @@ export default function LoanApplication() {
     },
   });
 
-  const createApplicationMutation = {
-    mutate: (data: LoanApplicationForm) => {
-      // Simulate successful submission
-      setTimeout(() => {
-        toast({
-          title: "Application Submitted",
-          description: "Your loan application has been submitted successfully.",
-        });
-        navigate("/applications");
-      }, 1000);
+  const createApplicationMutation = useMutation({
+    mutationFn: async (data: LoanApplicationForm) => {
+      // Enhanced validation and submission simulation
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate API call with validation
+          if (data.loanAmountRequested < 1000) {
+            reject(new Error("Minimum loan amount is $1,000"));
+            return;
+          }
+          
+          const applicationData = {
+            id: `L-${Date.now()}`,
+            ...data,
+            submittedAt: new Date().toISOString(),
+            status: 'pending',
+          };
+          
+          resolve(applicationData);
+        }, 2000);
+      });
     },
-    isPending: false,
-  };
+    onSuccess: () => {
+      toast({
+        title: "Application Submitted Successfully",
+        description: "Your loan application has been submitted and is being reviewed. You will be notified of any updates.",
+      });
+      navigate("/applications");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Submission Failed",
+        description: error.message || "Failed to submit application. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const onSubmit = async (data: LoanApplicationForm) => {
     // Validate all required fields are filled
@@ -102,8 +125,28 @@ export default function LoanApplication() {
     createApplicationMutation.mutate(data);
   };
 
-  const nextStep = () => {
-    if (step < 3) setStep(step + 1);
+  const nextStep = async () => {
+    // Validate current step before proceeding
+    let fieldsToValidate: (keyof LoanApplicationForm)[] = [];
+    
+    if (step === 1) {
+      fieldsToValidate = ['applicantName', 'businessName'];
+    } else if (step === 2) {
+      fieldsToValidate = ['contactEmail', 'phoneNumber'];
+    }
+    
+    // Trigger validation for current step fields
+    const isValid = await form.trigger(fieldsToValidate);
+    
+    if (isValid && step < 3) {
+      setStep(step + 1);
+    } else if (!isValid) {
+      toast({
+        title: "Please Complete Required Fields",
+        description: "Fill in all required fields before proceeding to the next step.",
+        variant: "destructive",
+      });
+    }
   };
 
   const prevStep = () => {
@@ -249,7 +292,7 @@ export default function LoanApplication() {
                   </div>
                   <div className="flex justify-end">
                     <Button type="button" onClick={nextStep}>
-                      Next
+                      Next Step
                     </Button>
                   </div>
                 </CardContent>
@@ -300,10 +343,10 @@ export default function LoanApplication() {
                   </div>
                   <div className="flex justify-between">
                     <Button type="button" variant="outline" onClick={prevStep}>
-                      Previous
+                      Previous Step
                     </Button>
                     <Button type="button" onClick={nextStep}>
-                      Next
+                      Next Step
                     </Button>
                   </div>
                 </CardContent>
@@ -414,7 +457,7 @@ export default function LoanApplication() {
                   />
                   <div className="flex justify-between pt-4">
                     <Button type="button" variant="outline" onClick={prevStep}>
-                      Previous
+                      Previous Step
                     </Button>
                     <div className="space-x-2">
                       <Button type="button" variant="outline">
@@ -425,6 +468,7 @@ export default function LoanApplication() {
                         disabled={createApplicationMutation.isPending}
                         className="bg-blue-600 hover:bg-blue-700"
                       >
+                        {createApplicationMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {createApplicationMutation.isPending ? "Submitting..." : "Submit Application"}
                       </Button>
                     </div>

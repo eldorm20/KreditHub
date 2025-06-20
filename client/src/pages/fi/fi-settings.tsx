@@ -5,7 +5,7 @@ import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -438,9 +438,11 @@ export default function FISettings() {
                             </p>
                           </div>
                           <FormControl>
-                            <Switch
+                            <input 
+                              type="checkbox" 
+                              className="toggle"
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onChange={(e) => field.onChange(e.target.checked)}
                             />
                           </FormControl>
                         </FormItem>
@@ -473,21 +475,21 @@ export default function FISettings() {
                       <p className="text-base font-medium">New Applications</p>
                       <p className="text-sm text-gray-500">Get notified when new loan applications are submitted</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                   <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
                       <p className="text-base font-medium">Application Updates</p>
                       <p className="text-sm text-gray-500">Receive updates on application status changes</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                   <div className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
                       <p className="text-base font-medium">Messages</p>
                       <p className="text-sm text-gray-500">Get notified of new messages from applicants</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                 </div>
               </CardContent>

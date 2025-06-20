@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+
 import { 
   Users, 
   Building, 
@@ -15,7 +16,8 @@ import {
   CheckCircle,
   Activity,
   Database,
-  UserCheck
+  UserCheck,
+  Save
 } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
@@ -438,28 +440,28 @@ export default function AdminDashboard() {
                       <p className="font-medium">Maintenance Mode</p>
                       <p className="text-sm text-gray-500">Enable maintenance mode for updates</p>
                     </div>
-                    <Switch />
+                    <input type="checkbox" className="toggle" />
                   </div>
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">User Registration</p>
                       <p className="text-sm text-gray-500">Allow new user registrations</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">Email Notifications</p>
                       <p className="text-sm text-gray-500">Send system email notifications</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">Auto Backup</p>
                       <p className="text-sm text-gray-500">Automatic daily database backups</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                 </CardContent>
               </Card>
@@ -541,21 +543,21 @@ export default function AdminDashboard() {
                       <p className="font-medium">Credit Bureau Integration</p>
                       <p className="text-sm text-gray-500">Connect to KATM credit bureau</p>
                     </div>
-                    <Switch />
+                    <input type="checkbox" className="toggle" />
                   </div>
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">SMS Gateway</p>
                       <p className="text-sm text-gray-500">Enable SMS notifications</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">Payment Gateway</p>
                       <p className="text-sm text-gray-500">Enable online payments</p>
                     </div>
-                    <Switch defaultChecked />
+                    <input type="checkbox" className="toggle" defaultChecked />
                   </div>
                   <Button variant="outline" className="w-full">
                     Manage API Keys
