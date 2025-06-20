@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Upload, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
+import { FilePreview } from "@/components/ui/file-preview";
 
 interface Document {
   id: string;
@@ -12,6 +13,9 @@ interface Document {
   status: 'verified' | 'pending' | 'rejected';
   uploadDate: string;
   required: boolean;
+  size: number;
+  type: string;
+  url?: string;
 }
 
 const requiredDocuments = [
@@ -56,9 +60,21 @@ export default function Documents() {
         status: 'pending',
         uploadDate: new Date().toISOString(),
         required: false,
+        size: file.size,
+        type: file.type,
+        url: URL.createObjectURL(file),
       };
       setDocuments(prev => [...prev, newDoc]);
     });
+  };
+
+  const removeDocument = (id: string) => {
+    setDocuments(prev => prev.filter(doc => doc.id !== id));
+  };
+
+  const viewDocument = (id: string) => {
+    // Handle document viewing
+    console.log('Viewing document:', id);
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,26 +182,19 @@ export default function Documents() {
                 ) : (
                   <div className="space-y-4">
                     {documents.map((doc) => (
-                      <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center space-x-4">
-                          <FileText className="h-8 w-8 text-gray-400" />
-                          <div>
-                            <p className="font-medium">{doc.name}</p>
-                            <p className="text-sm text-gray-500">
-                              Uploaded {new Date(doc.uploadDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge className={`${getStatusColor(doc.status)} flex items-center gap-1`}>
-                            {getStatusIcon(doc.status)}
-                            {doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
-                          </Badge>
-                          <Button variant="outline" size="sm">
-                            View
-                          </Button>
-                        </div>
-                      </div>
+                      <FilePreview
+                        key={doc.id}
+                        file={{
+                          id: doc.id,
+                          name: doc.name,
+                          size: doc.size,
+                          type: doc.type,
+                          url: doc.url,
+                          status: doc.status,
+                        }}
+                        onRemove={removeDocument}
+                        onView={viewDocument}
+                      />
                     ))}
                   </div>
                 )}

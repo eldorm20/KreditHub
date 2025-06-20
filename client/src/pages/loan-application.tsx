@@ -68,7 +68,37 @@ export default function LoanApplication() {
     isPending: false,
   };
 
-  const onSubmit = (data: LoanApplicationForm) => {
+  const onSubmit = async (data: LoanApplicationForm) => {
+    // Validate all required fields are filled
+    const errors = form.formState.errors;
+    if (Object.keys(errors).length > 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Additional validation
+    if (!data.applicantName || !data.businessName || !data.contactEmail || !data.phoneNumber) {
+      toast({
+        title: "Required Fields Missing",
+        description: "Please complete all required fields in the previous steps.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (data.loanAmountRequested < 1000) {
+      toast({
+        title: "Invalid Amount",
+        description: "Minimum loan amount is $1,000.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     createApplicationMutation.mutate(data);
   };
 

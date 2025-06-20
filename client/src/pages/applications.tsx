@@ -187,18 +187,35 @@ export default function Applications() {
 
                   <div className="flex justify-between items-center mt-6 pt-4 border-t">
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        View Details
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        asChild
+                      >
+                        <Link href={`/applications/${application.id}`}>
+                          View Details
+                        </Link>
                       </Button>
                       {application.applicationStatus === 'pending' && (
-                        <Button variant="outline" size="sm">
-                          Edit Application
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          asChild
+                        >
+                          <Link href={`/applications/${application.id}/edit`}>
+                            Edit Application
+                          </Link>
                         </Button>
                       )}
                     </div>
                     {application.applicationStatus === 'offer_sent' && (
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        View Offers
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700"
+                        asChild
+                      >
+                        <Link href={`/applications/${application.id}/offers`}>
+                          View Offers
+                        </Link>
                       </Button>
                     )}
                   </div>

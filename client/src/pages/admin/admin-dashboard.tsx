@@ -142,9 +142,9 @@ export default function AdminDashboard() {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="system">System Health</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="users" id="users-tab">User Management</TabsTrigger>
+            <TabsTrigger value="system" id="system-tab">System Health</TabsTrigger>
+            <TabsTrigger value="settings" id="settings-tab">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -217,19 +217,35 @@ export default function AdminDashboard() {
                   <CardTitle>Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => document.getElementById('users-tab')?.click()}
+                  >
                     <Users className="h-4 w-4 mr-2" />
                     Manage Users
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => document.getElementById('system-tab')?.click()}
+                  >
                     <Database className="h-4 w-4 mr-2" />
                     System Backup
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => document.getElementById('settings-tab')?.click()}
+                  >
                     <Settings className="h-4 w-4 mr-2" />
                     Platform Settings
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button 
+                    className="w-full justify-start" 
+                    variant="outline"
+                    onClick={() => document.getElementById('system-tab')?.click()}
+                  >
                     <Shield className="h-4 w-4 mr-2" />
                     Security Audit
                   </Button>
@@ -261,18 +277,88 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="users">
+          <TabsContent value="users" className="space-y-6">
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* User Statistics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>User Statistics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span>Total Users</span>
+                      <span className="font-bold">1,247</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Active Today</span>
+                      <span className="font-bold text-green-600">892</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>New This Month</span>
+                      <span className="font-bold text-blue-600">156</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Pending Verification</span>
+                      <span className="font-bold text-yellow-600">23</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Recent Users */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle>Recent Users</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {[
+                      { name: "TechStart Solutions", type: "SMB", status: "Active", joinDate: "2024-01-15" },
+                      { name: "Kapital Bank", type: "FI", status: "Active", joinDate: "2024-01-14" },
+                      { name: "InnovateBiz LLC", type: "SMB", status: "Pending", joinDate: "2024-01-13" },
+                      { name: "Aloqa Bank", type: "FI", status: "Active", joinDate: "2024-01-12" },
+                      { name: "StartupHub Inc", type: "SMB", status: "Active", joinDate: "2024-01-11" },
+                    ].map((user, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            {user.type === 'FI' ? <Building className="h-4 w-4 text-blue-600" /> : <Users className="h-4 w-4 text-blue-600" />}
+                          </div>
+                          <div>
+                            <p className="font-medium">{user.name}</p>
+                            <p className="text-sm text-gray-500">{user.type} • Joined {user.joinDate}</p>
+                          </div>
+                        </div>
+                        <Badge className={user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                          {user.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* User Management Actions */}
             <Card>
               <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>Manage platform users and permissions</CardDescription>
+                <CardTitle>User Management Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12">
-                  <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">User Management Panel</h3>
-                  <p className="text-gray-500 mb-6">Comprehensive user management features coming soon</p>
-                  <Button>View All Users</Button>
+                <div className="grid md:grid-cols-3 gap-4">
+                  <Button className="h-20 flex-col">
+                    <Users className="h-6 w-6 mb-2" />
+                    View All Users
+                  </Button>
+                  <Button variant="outline" className="h-20 flex-col">
+                    <UserCheck className="h-6 w-6 mb-2" />
+                    Verify Pending
+                  </Button>
+                  <Button variant="outline" className="h-20 flex-col">
+                    <Shield className="h-6 w-6 mb-2" />
+                    Manage Permissions
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -339,18 +425,156 @@ export default function AdminDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="settings">
+          <TabsContent value="settings" className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Platform Configuration */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Platform Configuration</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Maintenance Mode</p>
+                      <p className="text-sm text-gray-500">Enable maintenance mode for updates</p>
+                    </div>
+                    <Switch />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">User Registration</p>
+                      <p className="text-sm text-gray-500">Allow new user registrations</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Email Notifications</p>
+                      <p className="text-sm text-gray-500">Send system email notifications</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Auto Backup</p>
+                      <p className="text-sm text-gray-500">Automatic daily database backups</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Security Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Security Settings</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="font-medium mb-2">Session Timeout</p>
+                    <select className="w-full p-2 border rounded">
+                      <option>30 minutes</option>
+                      <option>1 hour</option>
+                      <option>2 hours</option>
+                      <option>4 hours</option>
+                    </select>
+                  </div>
+                  <div>
+                    <p className="font-medium mb-2">Password Requirements</p>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <div>• Minimum 8 characters</div>
+                      <div>• At least one uppercase letter</div>
+                      <div>• At least one number</div>
+                      <div>• At least one special character</div>
+                    </div>
+                  </div>
+                  <Button variant="outline" className="w-full">
+                    Configure Security Policies
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* System Limits */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>System Limits</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="font-medium mb-2">Maximum File Upload Size</p>
+                    <select className="w-full p-2 border rounded">
+                      <option>10 MB</option>
+                      <option>25 MB</option>
+                      <option>50 MB</option>
+                      <option>100 MB</option>
+                    </select>
+                  </div>
+                  <div>
+                    <p className="font-medium mb-2">API Rate Limit</p>
+                    <select className="w-full p-2 border rounded">
+                      <option>100 requests/minute</option>
+                      <option>500 requests/minute</option>
+                      <option>1000 requests/minute</option>
+                      <option>Unlimited</option>
+                    </select>
+                  </div>
+                  <div>
+                    <p className="font-medium mb-2">Maximum Loan Amount</p>
+                    <input 
+                      type="number" 
+                      defaultValue="10000000"
+                      className="w-full p-2 border rounded"
+                      placeholder="Maximum allowed loan amount"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Integration Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Integration Settings</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Credit Bureau Integration</p>
+                      <p className="text-sm text-gray-500">Connect to KATM credit bureau</p>
+                    </div>
+                    <Switch />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">SMS Gateway</p>
+                      <p className="text-sm text-gray-500">Enable SMS notifications</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Payment Gateway</p>
+                      <p className="text-sm text-gray-500">Enable online payments</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <Button variant="outline" className="w-full">
+                    Manage API Keys
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Save Settings */}
             <Card>
-              <CardHeader>
-                <CardTitle>Platform Settings</CardTitle>
-                <CardDescription>Configure platform-wide settings and preferences</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <Settings className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Settings Panel</h3>
-                  <p className="text-gray-500 mb-6">Advanced configuration options available here</p>
-                  <Button>Access Settings</Button>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-500">
+                    Changes will be applied immediately to the platform
+                  </p>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save All Settings
+                  </Button>
                 </div>
               </CardContent>
             </Card>

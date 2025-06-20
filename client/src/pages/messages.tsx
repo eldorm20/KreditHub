@@ -53,10 +53,37 @@ export default function Messages() {
     }
   ];
 
-  const { data: messages = [] } = useQuery<Message[]>({
-    queryKey: ["/api/conversations", "current-user", selectedContact?.id],
-    enabled: !!selectedContact,
-  });
+  // Mock messages for demo - in real app this would come from API
+  const mockMessages: Message[] = selectedContact ? [
+    {
+      id: "msg-1",
+      senderId: selectedContact.id,
+      receiverId: "current-user",
+      messageContent: "Thank you for your loan application. We have received all your documents and are currently reviewing your request.",
+      sentAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      isRead: true,
+      senderName: selectedContact.name,
+    },
+    {
+      id: "msg-2",
+      senderId: "current-user",
+      receiverId: selectedContact.id,
+      messageContent: "Thank you for the update. Do you need any additional information from us?",
+      sentAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+      isRead: true,
+    },
+    {
+      id: "msg-3",
+      senderId: selectedContact.id,
+      receiverId: "current-user",
+      messageContent: "We may need updated financial statements for the current quarter. Can you provide those?",
+      sentAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+      isRead: false,
+      senderName: selectedContact.name,
+    }
+  ] : [];
+
+  const messages = mockMessages;
 
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { receiverId: string; messageContent: string }) => {

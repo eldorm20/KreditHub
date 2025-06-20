@@ -179,15 +179,7 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">Demo Credentials:</p>
-              <div className="text-xs text-gray-500 dark:text-gray-500 space-y-1">
-                <div>Business: demo@business.com / password123</div>
-                <div>Bank: demo@bank.com / password123</div>
-                <div>Admin: admin@kredithub.com / admin123</div>
-              </div>
-            </div>
+
           </CardContent>
         </Card>
       </div>
