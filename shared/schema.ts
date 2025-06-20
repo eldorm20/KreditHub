@@ -1,244 +1,251 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, varchar, uuid, decimal, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Enums
+export type UserType = 'smb' | 'fi' | 'admin';
+export type ApplicationStatus = 'pending' | 'under_review' | 'offer_sent' | 'accepted' | 'rejected';
+export type OfferStatus = 'pending_acceptance' | 'accepted' | 'rejected_by_smb';
+export type LoanType = 'working_capital' | 'equipment_purchase' | 'investment' | 'other';
+export type LegalForm = 'llc' | 'individual_entrepreneur' | 'joint_stock' | 'other';
+
+// Sessions table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Users table
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  username: varchar("username", { length: 50 }).notNull().unique(),
   email: varchar("email", { length: 100 }).notNull().unique(),
-  name: varchar("name", { length: 100 }).notNull(),
-  department: varchar("department", { length: 50 }),
-  avatarUrl: text("avatar_url"),
-  totalPoints: integer("total_points").default(0),
-  currentStreak: integer("current_streak").default(0),
-  bestStreak: integer("best_streak").default(0),
-  questionsAnswered: integer("questions_answered").default(0),
-  culturesExplored: integer("cultures_explored").default(0),
-  gamesPlayed: integer("games_played").default(0),
+  userType: varchar("user_type", { length: 20 }).notNull().$type<UserType>(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const cultures = pgTable("cultures", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 50 }).notNull(),
-  region: varchar("region", { length: 50 }),
-  description: text("description"),
-  imageUrl: text("image_url"),
-  featured: boolean("featured").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 50 }).notNull(),
-  description: text("description"),
-  iconName: varchar("icon_name", { length: 50 }),
-});
-
-export const questions = pgTable("questions", {
-  id: serial("id").primaryKey(),
-  cultureId: integer("culture_id").references(() => cultures.id),
-  categoryId: integer("category_id").references(() => categories.id),
-  questionText: text("question_text").notNull(),
-  correctAnswer: varchar("correct_answer", { length: 200 }).notNull(),
-  options: jsonb("options").notNull(), // Array of answer options
-  explanation: text("explanation"),
-  difficulty: varchar("difficulty", { length: 10 }).notNull(), // easy, medium, hard
-  imageUrl: text("image_url"),
-  points: integer("points").default(10),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const games = pgTable("games", {
+// SMB Profiles
+export const smbProfiles = pgTable("smb_profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
-  hostUserId: uuid("host_user_id").references(() => users.id),
-  mode: varchar("mode", { length: 20 }).notNull(), // quick, deepdive, team
-  status: varchar("status", { length: 20 }).default("waiting"), // waiting, active, completed
-  totalQuestions: integer("total_questions").default(10),
-  timePerQuestion: integer("time_per_question").default(30), // seconds
-  maxPlayers: integer("max_players").default(1),
-  currentQuestion: integer("current_question").default(0),
-  startedAt: timestamp("started_at"),
-  completedAt: timestamp("completed_at"),
+  userId: uuid("user_id").references(() => users.id).notNull(),
+  companyName: varchar("company_name", { length: 200 }).notNull(),
+  tin: varchar("tin", { length: 50 }).notNull(),
+  legalForm: varchar("legal_form", { length: 50 }).notNull().$type<LegalForm>(),
+  legalAddress: text("legal_address").notNull(),
+  contactPerson: varchar("contact_person", { length: 100 }).notNull(),
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  industrySector: varchar("industry_sector", { length: 100 }).notNull(),
+  numEmployees: integer("num_employees").notNull(),
+  annualRevenue: varchar("annual_revenue", { length: 50 }).notNull(),
+  isVerified: boolean("is_verified").default(false),
+  documentsUrls: jsonb("documents_urls").$type<string[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const gameParticipants = pgTable("game_participants", {
-  id: serial("id").primaryKey(),
-  gameId: uuid("game_id").references(() => games.id),
-  userId: uuid("user_id").references(() => users.id),
-  score: integer("score").default(0),
-  correctAnswers: integer("correct_answers").default(0),
-  questionsAnswered: integer("questions_answered").default(0),
-  joinedAt: timestamp("joined_at").defaultNow(),
-  completedAt: timestamp("completed_at"),
+// FI Profiles
+export const fiProfiles = pgTable("fi_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id).notNull(),
+  institutionName: varchar("institution_name", { length: 200 }).notNull(),
+  contactPerson: varchar("contact_person", { length: 100 }).notNull(),
+  phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+  email: varchar("email", { length: 100 }),
+  loanTypesOffered: jsonb("loan_types_offered").$type<LoanType[]>().default([]),
+  websiteUrl: varchar("website_url", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const gameQuestions = pgTable("game_questions", {
-  id: serial("id").primaryKey(),
-  gameId: uuid("game_id").references(() => games.id),
-  questionId: integer("question_id").references(() => questions.id),
-  orderIndex: integer("order_index").notNull(),
-  timeLimit: integer("time_limit").default(30),
+// Loan Applications
+export const loanApplications = pgTable("loan_applications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  smbId: uuid("smb_id").references(() => smbProfiles.id).notNull(),
+  loanAmountRequested: decimal("loan_amount_requested", { precision: 15, scale: 2 }).notNull(),
+  loanPurpose: text("loan_purpose").notNull(),
+  repaymentPeriodRequested: integer("repayment_period_requested").notNull(),
+  loanType: varchar("loan_type", { length: 50 }).notNull().$type<LoanType>(),
+  applicationStatus: varchar("application_status", { length: 20 }).notNull().$type<ApplicationStatus>(),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+  lastUpdatedAt: timestamp("last_updated_at").defaultNow(),
+  supportingDocuments: jsonb("supporting_documents").$type<string[]>().default([]),
 });
 
-export const gameAnswers = pgTable("game_answers", {
-  id: serial("id").primaryKey(),
-  gameId: uuid("game_id").references(() => games.id),
-  userId: uuid("user_id").references(() => users.id),
-  questionId: integer("question_id").references(() => questions.id),
-  selectedAnswer: varchar("selected_answer", { length: 200 }),
-  isCorrect: boolean("is_correct").default(false),
-  timeSpent: integer("time_spent"), // seconds
-  pointsEarned: integer("points_earned").default(0),
-  answeredAt: timestamp("answered_at").defaultNow(),
+// Loan Offers
+export const loanOffers = pgTable("loan_offers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  loanApplicationId: uuid("loan_application_id").references(() => loanApplications.id).notNull(),
+  fiId: uuid("fi_id").references(() => fiProfiles.id).notNull(),
+  offeredAmount: decimal("offered_amount", { precision: 15, scale: 2 }).notNull(),
+  interestRate: decimal("interest_rate", { precision: 5, scale: 2 }).notNull(),
+  repaymentPeriodOffered: integer("repayment_period_offered").notNull(),
+  offerConditions: text("offer_conditions"),
+  offerStatus: varchar("offer_status", { length: 20 }).notNull().$type<OfferStatus>(),
+  offeredAt: timestamp("offered_at").defaultNow(),
 });
 
-export const achievements = pgTable("achievements", {
+// Messages
+export const messages = pgTable("messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  senderId: uuid("sender_id").references(() => users.id).notNull(),
+  receiverId: uuid("receiver_id").references(() => users.id).notNull(),
+  loanApplicationId: uuid("loan_application_id").references(() => loanApplications.id),
+  messageContent: text("message_content").notNull(),
+  sentAt: timestamp("sent_at").defaultNow(),
+  isRead: boolean("is_read").default(false),
+});
+
+// Currencies
+export const currencies = pgTable("currencies", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
+  code: varchar("code", { length: 3 }).notNull().unique(),
+  name: varchar("name", { length: 50 }).notNull(),
+  exchangeRate: decimal("exchange_rate", { precision: 10, scale: 6 }).notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// Transactions
+export const transactions = pgTable("transactions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id).notNull(),
+  amount: decimal("amount", { precision: 15, scale: 2 }).notNull(),
+  currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
   description: text("description"),
-  iconName: varchar("icon_name", { length: 50 }),
-  condition: jsonb("condition"), // Achievement criteria
-  points: integer("points").default(0),
-  rarity: varchar("rarity", { length: 20 }).default("common"), // common, rare, epic, legendary
-});
-
-export const userAchievements = pgTable("user_achievements", {
-  id: serial("id").primaryKey(),
-  userId: uuid("user_id").references(() => users.id),
-  achievementId: integer("achievement_id").references(() => achievements.id),
-  earnedAt: timestamp("earned_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Relations
-export const usersRelations = relations(users, ({ many }) => ({
-  gameParticipants: many(gameParticipants),
-  gameAnswers: many(gameAnswers),
-  userAchievements: many(userAchievements),
-  hostedGames: many(games),
+export const usersRelations = relations(users, ({ one, many }) => ({
+  smbProfile: one(smbProfiles),
+  fiProfile: one(fiProfiles),
+  sentMessages: many(messages, { relationName: "sentMessages" }),
+  receivedMessages: many(messages, { relationName: "receivedMessages" }),
+  transactions: many(transactions),
 }));
 
-export const culturesRelations = relations(cultures, ({ many }) => ({
-  questions: many(questions),
-}));
-
-export const categoriesRelations = relations(categories, ({ many }) => ({
-  questions: many(questions),
-}));
-
-export const questionsRelations = relations(questions, ({ one, many }) => ({
-  culture: one(cultures, {
-    fields: [questions.cultureId],
-    references: [cultures.id],
-  }),
-  category: one(categories, {
-    fields: [questions.categoryId],
-    references: [categories.id],
-  }),
-  gameQuestions: many(gameQuestions),
-  gameAnswers: many(gameAnswers),
-}));
-
-export const gamesRelations = relations(games, ({ one, many }) => ({
-  host: one(users, {
-    fields: [games.hostUserId],
-    references: [users.id],
-  }),
-  participants: many(gameParticipants),
-  questions: many(gameQuestions),
-  answers: many(gameAnswers),
-}));
-
-export const gameParticipantsRelations = relations(gameParticipants, ({ one }) => ({
-  game: one(games, {
-    fields: [gameParticipants.gameId],
-    references: [games.id],
-  }),
+export const smbProfilesRelations = relations(smbProfiles, ({ one, many }) => ({
   user: one(users, {
-    fields: [gameParticipants.userId],
+    fields: [smbProfiles.userId],
     references: [users.id],
   }),
+  loanApplications: many(loanApplications),
 }));
 
-export const gameQuestionsRelations = relations(gameQuestions, ({ one }) => ({
-  game: one(games, {
-    fields: [gameQuestions.gameId],
-    references: [games.id],
-  }),
-  question: one(questions, {
-    fields: [gameQuestions.questionId],
-    references: [questions.id],
-  }),
-}));
-
-export const gameAnswersRelations = relations(gameAnswers, ({ one }) => ({
-  game: one(games, {
-    fields: [gameAnswers.gameId],
-    references: [games.id],
-  }),
+export const fiProfilesRelations = relations(fiProfiles, ({ one, many }) => ({
   user: one(users, {
-    fields: [gameAnswers.userId],
+    fields: [fiProfiles.userId],
     references: [users.id],
   }),
-  question: one(questions, {
-    fields: [gameAnswers.questionId],
-    references: [questions.id],
+  loanOffers: many(loanOffers),
+}));
+
+export const loanApplicationsRelations = relations(loanApplications, ({ one, many }) => ({
+  smbProfile: one(smbProfiles, {
+    fields: [loanApplications.smbId],
+    references: [smbProfiles.id],
+  }),
+  loanOffers: many(loanOffers),
+  messages: many(messages),
+}));
+
+export const loanOffersRelations = relations(loanOffers, ({ one }) => ({
+  loanApplication: one(loanApplications, {
+    fields: [loanOffers.loanApplicationId],
+    references: [loanApplications.id],
+  }),
+  fiProfile: one(fiProfiles, {
+    fields: [loanOffers.fiId],
+    references: [fiProfiles.id],
   }),
 }));
 
-export const achievementsRelations = relations(achievements, ({ many }) => ({
-  userAchievements: many(userAchievements),
+export const messagesRelations = relations(messages, ({ one }) => ({
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
+    relationName: "sentMessages",
+  }),
+  receiver: one(users, {
+    fields: [messages.receiverId],
+    references: [users.id],
+    relationName: "receivedMessages",
+  }),
+  loanApplication: one(loanApplications, {
+    fields: [messages.loanApplicationId],
+    references: [loanApplications.id],
+  }),
 }));
 
-export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+export const transactionsRelations = relations(transactions, ({ one }) => ({
   user: one(users, {
-    fields: [userAchievements.userId],
+    fields: [transactions.userId],
     references: [users.id],
-  }),
-  achievement: one(achievements, {
-    fields: [userAchievements.achievementId],
-    references: [achievements.id],
   }),
 }));
 
-// Insert schemas
+// Types
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type SMBProfile = typeof smbProfiles.$inferSelect;
+export type InsertSMBProfile = typeof smbProfiles.$inferInsert;
+export type FIProfile = typeof fiProfiles.$inferSelect;
+export type InsertFIProfile = typeof fiProfiles.$inferInsert;
+export type LoanApplication = typeof loanApplications.$inferSelect;
+export type InsertLoanApplication = typeof loanApplications.$inferInsert;
+export type LoanOffer = typeof loanOffers.$inferSelect;
+export type InsertLoanOffer = typeof loanOffers.$inferInsert;
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = typeof messages.$inferInsert;
+export type Currency = typeof currencies.$inferSelect;
+export type InsertCurrency = typeof currencies.$inferInsert;
+export type Transaction = typeof transactions.$inferSelect;
+export type InsertTransaction = typeof transactions.$inferInsert;
+
+// Zod schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const insertGameSchema = createInsertSchema(games).omit({
+export const insertSMBProfileSchema = createInsertSchema(smbProfiles).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
-export const insertGameParticipantSchema = createInsertSchema(gameParticipants).omit({
+export const insertFIProfileSchema = createInsertSchema(fiProfiles).omit({
   id: true,
-  joinedAt: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
-export const insertGameAnswerSchema = createInsertSchema(gameAnswers).omit({
+export const insertLoanApplicationSchema = createInsertSchema(loanApplications).omit({
   id: true,
-  answeredAt: true,
+  submittedAt: true,
+  lastUpdatedAt: true,
 });
 
-// Types
-export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type Culture = typeof cultures.$inferSelect;
-export type Category = typeof categories.$inferSelect;
-export type Question = typeof questions.$inferSelect;
-export type Game = typeof games.$inferSelect;
-export type GameParticipant = typeof gameParticipants.$inferSelect;
-export type GameQuestion = typeof gameQuestions.$inferSelect;
-export type GameAnswer = typeof gameAnswers.$inferSelect;
-export type Achievement = typeof achievements.$inferSelect;
-export type UserAchievement = typeof userAchievements.$inferSelect;
+export const insertLoanOfferSchema = createInsertSchema(loanOffers).omit({
+  id: true,
+  offeredAt: true,
+});
 
-export type InsertGame = z.infer<typeof insertGameSchema>;
-export type InsertGameParticipant = z.infer<typeof insertGameParticipantSchema>;
-export type InsertGameAnswer = z.infer<typeof insertGameAnswerSchema>;
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  sentAt: true,
+});
+
+export type InsertUserType = z.infer<typeof insertUserSchema>;
+export type InsertSMBProfileType = z.infer<typeof insertSMBProfileSchema>;
+export type InsertFIProfileType = z.infer<typeof insertFIProfileSchema>;
+export type InsertLoanApplicationType = z.infer<typeof insertLoanApplicationSchema>;
+export type InsertLoanOfferType = z.infer<typeof insertLoanOfferSchema>;
+export type InsertMessageType = z.infer<typeof insertMessageSchema>;
