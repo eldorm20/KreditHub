@@ -107,41 +107,75 @@ export default function LoanApplication() {
           </p>
         </div>
 
-        {/* Language and Currency Selectors */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Language</label>
-            <Select defaultValue="english">
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="english">English</SelectItem>
-                <SelectItem value="uzbek">Uzbek</SelectItem>
-                <SelectItem value="russian">Russian</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-gray-500">Application Progress</span>
+            <span className="text-sm font-medium text-blue-600">{step} of 3</span>
           </div>
-          <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Currency</label>
-            <Select value={selectedCurrency.code} onValueChange={(code) => {
-              const currency = currencies.find(c => c.code === code);
-              if (currency) setCurrency(currency);
-            }}>
-              <SelectTrigger className="w-48">
-                <Globe className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {currencies.map((currency) => (
-                  <SelectItem key={currency.code} value={currency.code}>
-                    {currency.symbol} {currency.code} - {currency.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500 ease-in-out"
+              style={{ width: `${(step / 3) * 100}%` }}
+            ></div>
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-gray-500">
+            <span className={step >= 1 ? 'text-blue-600' : ''}>Business Info</span>
+            <span className={step >= 2 ? 'text-blue-600' : ''}>Loan Details</span>
+            <span className={step >= 3 ? 'text-blue-600' : ''}>Review & Submit</span>
           </div>
         </div>
+
+        {/* Language and Currency Selectors */}
+        <Card className="mb-8 shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Globe className="h-5 w-5 text-blue-600" />
+              Preferences
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  Application Language
+                </label>
+                <Select defaultValue="english">
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="english">🇺🇸 English</SelectItem>
+                    <SelectItem value="uzbek">🇺🇿 Uzbek</SelectItem>
+                    <SelectItem value="russian">🇷🇺 Russian</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+                  Preferred Currency
+                </label>
+                <Select value={selectedCurrency.code} onValueChange={(code) => {
+                  const currency = currencies.find(c => c.code === code);
+                  if (currency) setCurrency(currency);
+                }}>
+                  <SelectTrigger className="w-full">
+                    <Globe className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map((currency) => (
+                      <SelectItem key={currency.code} value={currency.code}>
+                        {currency.symbol} {currency.code} - {currency.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 mt-1">
+                  All amounts will be displayed in {selectedCurrency.name}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
